@@ -1,0 +1,173 @@
+.<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ToDo List</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    input {
+      margin: 5px;
+    }
+    button {
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>ToDo List</h2>
+
+  <!-- Form to add new todo -->
+  <form onsubmit="event.preventDefault(); addTodo();">
+    <label for="Date">Date:</label>
+    <input type="datetime-local" id="Date" required><br><br>
+
+    <label for="todo">ToDo:</label>
+    <input type="text" id="todo" required><br><br>
+
+    <label for="target">Target Date:</label>
+    <input type="datetime-local" id="target" required><br><br>
+
+    <label for="status">Status:</label>
+    <input type="text" id="status" disabled required><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <!-- Table to show todos -->
+  <table id="todoTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Target Date</th>
+        <th>Status</th>
+        <th>Actions</th> <!-- ✅ New Actions column -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be inserted here -->
+    </tbody>
+  </table>
+
+  <script>
+    // Initial ToDo items
+    var todoList = [
+      {
+        todoId: 100,
+        todoDesc: "Read Page 6",
+        targetDate: "2025-07-30 11:35",
+        todoStatus: "PENDING",
+        createDate: "2025-07-29 10:00"
+      },
+      {
+        todoId: 7,
+        todoDesc: "Write a document",
+        targetDate: "2025-07-30 12:40",
+        todoStatus: "COMPLETE",
+        createDate: "2025-07-29 10:00"
+      },
+      {
+        todoId: 3,
+        todoDesc: "Prepare a Presentation",
+        targetDate: "2025-07-30 01:40",
+        todoStatus: "IN-PROGRESS",
+        createDate: "2025-07-29 10:00"
+      }
+    ];
+
+    // Get the current highest ID
+    let maxObj = todoList.reduce((max, val) => max.todoId > val.todoId ? max : val);
+    let todoId = maxObj.todoId;
+
+    function renderTodoRow(todo) {
+      const newTodoTr = document.createElement("tr");
+
+      const newTodoIdTd = document.createElement("td");
+      newTodoIdTd.innerText = todo.todoId;
+
+      const newTodoDescTd = document.createElement("td");
+      newTodoDescTd.innerText = todo.todoDesc;
+
+      const newTodoTargetDateTd = document.createElement("td");
+      newTodoTargetDateTd.innerText = todo.targetDate;
+
+      const newTodoStatusTd = document.createElement("td");
+      newTodoStatusTd.innerText = todo.todoStatus;
+
+      // ✅ Actions column
+      const actionsTd = document.createElement("td");
+
+      const progressBtn = document.createElement("button");
+      progressBtn.innerText = "In-Progress";
+      
+      progressBtn.onclick = () => {
+        todo.todoStatus = "IN-PROGRESS";
+        refreshTable();
+      };
+
+      const completeBtn = document.createElement("button");
+      completeBtn.innerText = "Complete";
+      
+      completeBtn.onclick = () => {
+        todo.todoStatus = "COMPLETE";
+        refreshTable();
+      };
+
+      actionsTd.appendChild(progressBtn);
+      actionsTd.appendChild(completeBtn);
+
+      newTodoTr.appendChild(newTodoIdTd);
+      newTodoTr.appendChild(newTodoDescTd);
+      newTodoTr.appendChild(newTodoTargetDateTd);
+      newTodoTr.appendChild(newTodoStatusTd);
+      newTodoTr.appendChild(actionsTd);
+
+      document.querySelector("#todoTable tbody").appendChild(newTodoTr);
+    }
+
+    function refreshTable() {
+      const tbody = document.querySelector("#todoTable tbody");
+      tbody.innerHTML = "";
+      todoList.forEach(renderTodoRow);
+    }
+
+    function addTodo() {
+      const todoDesc = document.getElementById("todo").value.trim();
+      const targetDate = document.getElementById("target").value.trim();
+
+      if (!todoDesc || !targetDate) {
+        alert("Please enter both ToDo description and Target Date.");
+        return;
+      }
+
+      const todoStatus = "PENDING";
+      todoId++;
+
+      const newTodo = {
+        todoId: todoId,
+        todoDesc: todoDesc,
+        targetDate: targetDate,
+        todoStatus: todoStatus,
+        createDate: new Date().toISOString()
+      };
+
+      todoList.push(newTodo);
+      refreshTable();
+
+      document.getElementById("todo").value = "";
+      document.getElementById("target").value = "";
+    }
+
+    // Initial load
+    refreshTable();
+  </script>
+
+</body>
+</html>
